@@ -1,0 +1,27 @@
+hostname {{ hostname }}
+{% for interface in interface_list['interfaces'] %}
+interface {{ interface['name'] }}
+description {{ interface['desc'] }}
+ip address {{ interface['ip'] }} {{ interface['mask'] }}
+{% if 'vlan' in interface %}
+encapsulation dot1Q {{ interface['vlan'] }}
+{%if not interface.shutdown %}
+no shutdown
+{% endif %}
+{% endif %}
+{% endfor %}
+{% for interface in interfaces if interface.name == 'loopback0' %}
+interface {{ interface.name }}
+description {{ interface.desc }}
+ip address {{ interface.ip }} {{ interface.mask }}
+{%if not interface.shutdown %}
+no shutdown
+{% endif %}
+{% endfor %}
+{% if 'ospf' in interface_list %}
+router ospf {{ interface_list['ospf']['process_id'] }}
+router-id {{ interface_list['ospf']['router_id'] }}
+{% for network in interface_list['ospf']['networks'] %}
+network {{ network['network'] }} {{ network['wildcard'] }} area {{ network['area'] }}
+{% endfor %}
+{% endif %}
