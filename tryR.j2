@@ -1,0 +1,21 @@
+{% for router in routers %}
+hostname {{ router.hostname }}
+{% for interface in router.interfaces %}
+interface {{ interface.name }}
+description {{ interface.desc }}
+ip address {{ interface.ip }} {{ interface.mask }}
+{% if interface.vlan is defined %}
+encapsulation dot1Q {{ interface.vlan }}
+{% endif %}
+{% if not interface.shutdown %}
+no shutdown
+{% endif %}
+{% endfor %}
+{% if router.ospf is defined %}
+router ospf {{ router.ospf.process_id }}
+router-id {{ router.ospf.router_id }}
+{% for network in router.ospf.networks %}
+network {{ network.network }} {{ network.wildcard }} area {{ network.area }}
+{% endfor %}
+{% endif %}
+{% endfor %}
